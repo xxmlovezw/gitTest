@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>搜索结果</title>
+	<meta http-equiv="Content-Type" content="text/html;charset=utf-8">
+	<link rel="stylesheet" type="text/css" href="../style/searchResult.css">
+	<link rel="stylesheet" type="text/css" href="../font-awesome/css/font-awesome.min.css">
+	<script type="text/javascript" src="../script/jquery-2.1.4.min.js"></script>
+	<script src="https://cdn.staticfile.org/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
+    <script type="text/javascript">
+        $(document).ready(function() {
+
+        	$(".login").click(function() {
+        		$(location).attr('href',"../html/login.html");
+        	});
+        	
+        	$(".bor_btn").click(function() {
+        		var num=$(this).find("span").html();
+        		if (num<=0) {
+        			alert("该书被借光了~~");
+        		}
+        		else{
+        			alert("请到图书管理员处借阅~~");
+        		}
+        	});
+
+        	var btns=$(".bor_btn");
+        	for (var i = 0; i < btns.length; i++) {
+        		var num=$(btns[i]).find("span").html();
+        		if (num==0) {
+                    $(".bor_btn").eq(i).css('backgroundColor', '#BCBCBC');
+        		}
+        		else{
+        			$(".bor_btn").eq(i).css('backgroundColor', '#28B138');
+        		}
+        	}
+        	var cookie = $.cookie("login");
+        	if (cookie != null && cookie != "null"){
+        		var obj = JSON.parse(cookie);
+        		$(".username").text(obj.userName);
+				$(".state").css("display","inline-block");
+				$(".login").css("display","none");
+			}
+
+        	$(".perphoto").click(function () {
+				$(location).attr('href','../html/readerPerson.html')
+			});
+        	$(".delete").click(function () {
+				$.cookie("login",null);
+				$(".username").text("");
+				$(".state").css("display","none");
+				$(".login").css("display","inline-block");
+			});
+
+			$(".sch_btn").click(function () {
+				var query = $(".sch_text").val();
+				fetch("/search?query="+query, {
+					method: 'get',
+					headers: {
+						'Content-type': "application/x-www-form-urlencoded; charset=UTF-8"
+					}
+				}).then(function (response) {
+					response.json().then(function (value) {
+						console.log(value);
+						var eval1 = eval(value);
+						for (var i in eval1){
+							console.log(eval1[i]);
+							addQueryBook(eval1[i]);
+						}
+					})
+				}).catch(function (reason) {
+
+				})
+			});
+
+
+        });
+
+        function addQueryBook(obj){
+        	$(".result").append("<div class=\"book_result\">\n" +
+					"<div class=\"bk_name\">"+obj.bookName+"</div>\n" +
+					"<ul>" +
+					"<li>作者："+obj.author+"</li>" +
+					"<li>出版社:"+obj.publishCompany+"</li>" +
+					"</ul>" +
+					"<div class=\"bor_btn\">" +
+					"<div class=\"btn_name\">借阅</div>" +
+					"<div class=\"bk_num\">在库数量：<span>"+obj.numOnLibrary+"</span>本</div>" +
+					"</div>\n" +
+					"<div class=\"clear\"></div>" +
+					"</div>"
+
+			)
+		}
+    </script>
+</head>
+<body>
+<div class="search_page">
+	<div class="header">
+		<div class="home"><a href="../html/index.html"><i class="fa fa-home"></i>首页</a></div>
+		<div class="state">
+			<div class="perphoto"><img src="../images/perphoto.png"></div>
+			<div class="username" title="">张三</div>
+			<div class="delete">退出</div>
+		</div>
+		<div class="login">登录</div>
+		<div class="clear"></div>
+	</div>
+	<div class="content">
+		<div class="search">
+		    <input value="C语言" class="sch_text" />
+			<div class="sch_btn">搜索</div>
+		</div>
+
+		<div class="result">
+
+		</div>
+
+	</div>
+</div>
+</body>
+</html>

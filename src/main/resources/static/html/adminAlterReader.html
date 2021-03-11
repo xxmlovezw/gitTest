@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>系统管理员-修改读者信息</title>
+  <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
+  <link rel="stylesheet" type="text/css" href="../font-awesome/css/font-awesome.min.css">
+  <link rel="stylesheet" type="text/css" href="../style/adminMain.css">
+  <link rel="stylesheet" type="text/css" href="../style/adminReader.css">
+  <script type="text/javascript" src="../script/jquery-2.1.4.min.js"></script>
+    <script src="https://cdn.staticfile.org/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
+  <script type="text/javascript">
+     $(document).ready(function() {
+          $(".left ul li:eq(2)").css("color","#FFF");
+          $(".left ul li:eq(2)").css("background-color","#B78DE7");
+          $(".left ul").find('li:eq(2)').children(".trig").css('display', 'block');
+          // $(".data input").attr('disabled', 'false');
+          // $(".data input").eq(0).removeAttr('disabled');
+
+         var json =  $.cookie('login');
+         console.log(json);
+         var  obj = JSON.parse(json);
+         var userName = obj.userName;
+         var userId = obj.userId;
+         $(".ad_name").text(userName);
+
+         $(".out").click(function () {
+             $.cookie("login",null);
+             $(location).attr('href','../html/index.html');
+         })
+
+         $(".add_btn").click(function () {
+             var  userId = $(".data_userId").val();
+             var  departments = $(".data_departments").val();
+             var  major = $(".data_major").val();
+             var  phone = $(".data_phone").val();
+             var  email = $(".data_email").val();
+             var body ;
+             var  state = 0;
+             if(userId != null && userId != '' && typeof  userId != "undefined"){
+                 body = 'userId='+userId;
+             } else {
+                 alert("借阅号不能为空！");
+                 state = 1;
+             }
+
+             if (departments != null && departments != '' && typeof  departments != "undefined")
+                 body += '&departments='+departments;
+             if (major != null && major != '' && typeof major != "undefined" )
+                 body += '&major='+major;
+             if (phone != null && phone != '' && typeof phone != "undefined" )
+                 body += '&phone='+phone;
+             if (email != null && email != '' && typeof email != "undefined" )
+                 body += '&email='+email;
+             console.log(body);
+             if (state == 0)
+            fetch("/userInfo",{
+                method:"put",
+                headers:{
+                    'content-type':'application/x-www-form-urlencoded; charset=UTF-8'
+                },
+                body:body
+            }).then(function (response) {
+                return response.text()
+            }).then(function (value) {
+                console.log(value)
+                if ("ok" == value){
+                    alert("修改成功！");
+                }
+            }).catch(function (reason) {
+
+            })
+         })
+     });
+  </script>
+</head>
+<body>
+   <div class="ad_page">
+    <div class="header">
+      <img src="../images/logo.png">
+      <div class="state">
+        <div class="ad_name"><div class="fa_i"><i class="fa fa-user"></i></div><a href="../html/adminPersonal.html">管理员01</a></div>
+        <div class="out">退出</div>
+      </div>
+      <div class="clear"></div>
+    </div>
+    <div class="content">
+      <div class="left">
+        <ul>
+         <a href="../html/adminAddReader.html"><li>录入新读者<div class="trig"></div></li></a>
+          <a href="../html/adminOutReader.html"><li>删除读者<div class="trig"></div></li></a>
+          <a href="../html/adminAlterReader.html"><li>修改读者信息<div class="trig"></div></li></a>
+          <a href="../html/adminAddAd.html"><li>录入图书管理员<div class="trig"></div></li></a>
+          <a href="../html/adminOutAd.html"><li>删除图书管理员<div class="trig"></div></li></a>
+          <a href="../html/adminAlterAd.html"><li>修改管理员信息<div class="trig"></div></li></a>
+          <a href="../html/adminSearchReader.html"><li>查看读者信息<div class="trig"></div></li></a>
+          <a href="../html/adminSearchAd.html"><li>查看管理员信息<div class="trig"></div></li></a>
+          <a href="../html/adminPersonal.html"><li>管理员中心<div class="trig"></div></li></a>
+        </ul>
+      </div>
+      <div class="right">
+      <!-- class="ad_data"的div中是系统管理员系统的切换部分 -->
+        <div class="ad_data">
+          <div class="data"><label>借阅号</label><input class="data_userId" value="输入借阅号" onfocus="if(value=='输入借阅号') {value=''}" onblur="if (value=='') {value='输入借阅号'}"/></div>
+                <div class="data"><label>学院</label><input class="data_departments" type="text"/></div>
+                <div class="data"><label>专业</label><input class="data_major" type="text"/></div>
+                <div class="data"><label>电话</label><input class="data_phone" type="text"/></div>
+                <div class="data"><label>邮箱</label><input class="data_email" type="text"/></div>
+               <div class="add_btn">确认修改</div>
+                <div class="noadd_btn">取消</div>
+        </div>
+      </div>
+      <div class="clear"></div>
+    </div>
+   </div>
+</body>
+</html>

@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>图书管理员-读者借书</title>
+	<meta http-equiv="Content-Type" content="text/html;charset=utf-8">
+	<link rel="stylesheet" type="text/css" href="../font-awesome/css/font-awesome.min.css">
+	<link rel="stylesheet" type="text/css" href="../style/adMain.css">
+   <link rel="stylesheet" type="text/css" href="../style/adBorrowBook.css">
+	<script type="text/javascript" src="../script/jquery-2.1.4.min.js"></script>
+   <script type="text/javascript" src="../layer-v2.0/layer/layer.js"></script>
+    <script src="https://cdn.staticfile.org/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
+	<script type="text/javascript">
+	   $(document).ready(function() {
+	   	 $(".left ul li:eq(0)").css("color","#FFF");
+          $(".left ul li:eq(0)").css("background-color","#BBCAF1");
+          $(".left ul").find('li:eq(0)').children(".trig").css('display', 'block');
+
+          $('input[type=text]:first').focus();//默认光标位置在input
+          $(".table tbody tr:odd").css("backgroundColor","#FCF8E3");//表格奇数行背景
+
+           var json =  $.cookie('login');
+           console.log(json);
+           var  obj = JSON.parse(json);
+           var userName = obj.userName;
+           var userId = obj.userId;
+           $(".ad_name").text(userName);
+
+
+           $(".out").click(function () {
+               $.cookie("login",null);
+               $(location).attr('href','../html/index.html');
+           });
+
+
+
+
+           $(".A_btn").click(function () {
+               var bookId = $(".data_bookId").val();
+               var borrowId = $(".data_borrowId").val();
+               console.log("......");
+               var  time;
+               var bookName;
+               fetch("/borrowRecords/validation?borrowId="+borrowId+"&bookId="+bookId,{
+                   method:"get",
+                   headers:{
+                        'content-type':'application/x-www-form-urlencoded; charset=UTF-8'    
+                   }
+               }).then(function (response) { 
+                    return response.text()
+               }).then(function (value) { 
+                   console.log(value);
+                   if (value.indexOf("error") >= 0){
+                       alert(value);
+                   } else {
+                       console.log(value.indexOf("bookName:"));
+
+                       time = value.substr(3,value.indexOf("bookName:")-3);
+                       bookName = value.substr(value.indexOf("bookName:")+9,value.length);
+                       console.log("time---"+time+"bookName---"+bookName);
+                       addTable(borrowId,bookName,time,bookId)
+                   }
+               }).catch(function (reason) {
+                   alert("验证失败")
+               })
+           });
+           
+           $(".add_btn").click(function () {
+                var query = getAllTable();
+                console.log(query);
+                var tr = $(".table tbody tr").eq(1);
+                var userId = tr.children("td").eq(0).text();
+                var time = tr.children("td").eq(2).text();
+                console.log(userId);
+                var String = userId+","+time+","+query;
+                console.log(String);
+                fetch("/borrowRecords",{
+                   method:"post",
+                   headers:{
+                       'content-type':'application/x-www-form-urlencoded; charset=UTF-8'
+                   },
+                   body:"bookIdString="+String
+               }).then(function (response) {
+                   return response.text()
+               }).then(function (value) {
+                   console.log(value);
+                    if ("ok" == value){
+                        alert("借阅成功");
+                        removeAllTable();
+                    }
+               }).catch(function (reason) {
+                 alert("验证失败")
+               })
+           })
+	   });
+
+
+       function removeAllTable() {
+           $(".table  tr:not(:first)").empty("");
+       }
+
+       function getAllTable() {
+           var a = new Array();
+           $(".table tr").each(function (i) {
+               var b = $(this).children('td').eq(1).attr('class');
+               console.log(b);
+               a[i-1] = b;
+           });
+           return a.toString();
+       }
+
+       function addTable(userId,bookName,time,bookId) {
+           console.log("添加tr");
+           var table = $(".table tbody");
+           table.append('<tr class="data_borrow">' +
+               '<td>'+userId+'</td>' +
+               '<td class="'+bookId+'">'+bookName+'</td>' +
+               '<td>'+time+'</td>' +
+               '</tr>');
+       }
+	</script>
+</head>
+<body>
+   <div class="ad_page">
+   	<div class="header">
+   		<img src="../images/logo.png">
+   		<div class="state">
+   			<div class="ad_name"><div class="fa_i"><i class="fa fa-user"></i></div><a href="../html/adPersonal.html">管理员01</a></div>
+        <div class="out">退出</div>
+   		</div>
+   		<div class="clear"></div>
+   	</div>
+   	<div class="content">
+   		<div class="left">
+   			<ul>
+   				     <a href="../html/adBorrowBook.html"><li>读者借书<div class="trig"></div></li></a>
+               <a href="../html/adReturnBook.html"><li>读者还书<div class="trig"></div></li></a>
+               <a href="../html/adAddBook.html"><li>新书入库<div class="trig"></div></li></a>
+               <a href="../html/adOutBook.html"><li>图书出库<div class="trig"></div></li></a>
+               <a href="../html/adAlterBook.html"><li>修改图书信息<div class="trig"></div></li></a>
+               <a href="../html/adCheckBook.html"><li>查阅借阅记录<div class="trig"></div></li></a>
+               <a href="../html/adSearchBook.html"><li>查阅图书信息<div class="trig"></div></li></a>
+               <a href="../html/adPersonal.html"><li>管理员中心<div class="trig"></div></li></a>
+   			</ul>
+   		</div>
+   		<div class="right">
+      <!-- class="ad_data"的div中是图书管理员系统的切换部分 -->
+   			<div class="ad_data">
+   				     <div class="data data_1"><label>借阅号</label><input type="text" class="data_borrowId"/></div>
+               <div class="data"><label>图书编号</label><input type="text" class="data_bookId"/></div>
+               <div class="btn A_btn">验证</div>
+               <div class="btn B_btn">清空</div>
+               <div class="table_div">
+                  <table class="table">
+                        <thead>
+                          <th>借阅号</th>
+                          <th>图书名</th>
+                          <th>借阅期限</th>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                     </table>
+                     <div class="add_btn">确认借阅</div>
+                     <div class="clear"></div>
+               </div>
+   			</div>
+   		</div>
+   		<div class="clear"></div>
+   	</div>
+   </div>
+</body>
+</html>

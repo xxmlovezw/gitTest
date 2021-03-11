@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>登录</title>
+    <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
+    <link rel="stylesheet" type="text/css" href="../style/login.css">
+    <link rel="stylesheet" type="text/css" href="../font-awesome/css/font-awesome.min.css">
+    <script type="text/javascript" src="../script/jquery-2.1.4.min.js"></script>
+	<script src="https://cdn.staticfile.org/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
+    <script type="text/javascript">
+    	function change(){
+    		var result=$(".role").val()
+
+        }
+        function password_f(){
+            alert("亲，请到教务系统修改密码！");
+        }
+        $(document).ready(function () {
+			$(".login_btn").click(function () {
+				var id = $(".login_id").val();
+				var pwd = $(".login_pwd").val();
+				var type = $(".role").val();
+				fetch("/login?"+"type="+type+"&id="+id+"&password="+pwd,{
+					method:"get"
+				}).then(function (response) {
+					response.json().then(function(data){
+						console.log(data);
+						if (data != null){
+							var url ;
+							var json;
+							var userId;
+							var userName;
+							if (type==1) {
+								userId = data.userId;
+								userName = data.userName;
+								url = "../html/readerPersonal.html" ;
+							}else if(type==3){
+								userId = data.adminId;
+								userName = data.adminName;
+								url = "../html/adminAddReader.html";
+							}else if (type==2) {
+								userId = data.adId;
+								userName = data.adName;
+								url = "../html/adBorrowBook.html";
+
+							}
+							console.log(userId+"--"+userName);
+							json = {"userId":userId,"userName":userName};
+							var obj = JSON.stringify(json);
+							console.log(obj);
+							$.cookie('login',obj);
+							// window.open(url);
+							$(location).attr('href',url);
+						} else {
+							alert("登陆失败");
+						}
+
+					})
+				}).catch(function (error) {
+					console.log(error)
+				})
+			})
+		})
+    </script>
+</head>
+<body>
+<div class="login_page">
+	<div class="page_top"></div>
+	<div class="header"> 
+		<img src="../images/logo.png">
+		<div class="hello_word">中山图书馆欢迎您</div>
+		<div class="clear"></div>
+	</div>
+	<div class="login">
+		<div class="login_part" >
+			<select class="role" onchange="change()">
+				<option value="1">读者</option>
+				<option value="2">图书管理员</option>
+				<option value="3">系统管理员</option>
+			</select>
+			<hr class="lion" />
+            <div class="login_input">
+            	<div class="user"><i class="fa fa-user"></i></div>
+            	<input type="text" class="login_id" value="请输入通行证号"onfocus="if (value =='请输入通行证号'){value=''}" onblur="if (value=='') {value='请输入通行证号'}"/>&nbsp;<span class="text_red">*</span>
+            	<div class="user"><i class="fa fa-lock"></i></div>
+            	<input type="password" class="login_pwd"/>&nbsp;<span class="text_red">*</span>
+            </div>
+            <div class="login_btn">登录</div>
+            <div class="password_f" onclick="password_f()">忘记密码 ？</div>
+		</div>
+		<div class="clear"></div>
+		<div class="from">@Copyright重庆理工大学中山图书馆</div>
+	</div>
+</div>
+</body>
+</html>

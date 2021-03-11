@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>图书管理员-修改图书信息</title>
+	<meta http-equiv="Content-Type" content="text/html;charset=utf-8">
+	<link rel="stylesheet" type="text/css" href="../font-awesome/css/font-awesome.min.css">
+	<link rel="stylesheet" type="text/css" href="../style/adMain.css">
+  <link rel="stylesheet" type="text/css" href="../style/adBook.css">
+	<script type="text/javascript" src="../script/jquery-2.1.4.min.js"></script>
+   <script type="text/javascript" src="../layer-v2.0/layer/layer.js"></script>
+   <script type="text/javascript" src="../layer-v2.0/layer/extend/layer.ext.js"></script>
+	<script src="https://cdn.staticfile.org/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
+	<script type="text/javascript">
+	   $(document).ready(function() {
+          $(".left ul li:eq(4)").css("color","#FFF");
+          $(".left ul li:eq(4)").css("background-color","#BBCAF1");
+          $(".left ul").find('li:eq(4)').children(".trig").css('display', 'block');
+          // $(".data input").attr('disabled', 'true');
+          // $(".data input").eq(0).removeAttr('disabled');
+
+		   var json =  $.cookie('login');
+		   console.log(json);
+		   var  obj = JSON.parse(json);
+		   var userName = obj.userName;
+		   var userId = obj.userId;
+		   $(".ad_name").text(userName);
+
+		   $(".out").click(function () {
+			   $.cookie("login",null);
+			   $(location).attr('href','../html/index.html');
+		   });
+
+		   $(".add_btn").click(function () {
+			   var bookId = $(".data_bookId").val();
+			   var bookName = $(".data_bookName").val();
+			   var bookAuthor = $(".data_bookAuthor").val();
+			   var bookTranslator = $(".data_bookTranslator").val();
+			   var bookPrice = $(".data_bookPrice").val();
+			   var bookISBNCode = $(".data_ISBNCode").val();
+			   var bookPublishCompany = $(".data_publishCompany").val();
+			   var bookComeUpTime = $(".data_comeUpTime").val();
+			   var bookEnteringMen = $(".data_enteringMen").val();
+			   var body;
+			   var state = 0;
+			   if (bookId != null && bookId != '' && typeof bookId != "undefined")
+				   body = 'bookId='+bookId;
+			   else{
+				   alert("图书编号不能为空！！！");
+				   state = 1;
+			   }
+
+			   if(bookName != null && bookName != '' && typeof  bookName != "undefined")
+			   	  body += '&bookName='+bookName;
+			   if (bookAuthor != null && bookAuthor != '' && typeof  bookAuthor != "undefined")
+			   	   body += '&author='+bookAuthor;
+			   if (bookTranslator != null && bookTranslator != '' && typeof bookTranslator != "undefined")
+			   	   body += '&translator='+bookTranslator;
+			   if (bookISBNCode != null && bookISBNCode != '' && typeof bookISBNCode != "undefined")
+			   		body += '&ISBNCode='+bookISBNCode;
+			   if (bookPublishCompany != null && bookPublishCompany != '' && typeof bookPublishCompany != "undefined" )
+			   		body += '&publishCompany='+bookPublishCompany;
+			   if (bookComeUpTime != null && bookComeUpTime != '' && typeof bookComeUpTime != "undefined")
+			   		body += '&comeUpTime='+bookComeUpTime;
+			   if (bookEnteringMen != null && bookEnteringMen != '' && typeof bookEnteringMen != "undefined")
+			   		body += '&enteringMen='+bookEnteringMen;
+			   else{
+				   alert("入库者不能为空");
+				   state = 1;
+			   }
+
+			   if (bookPrice != null && bookPrice != '' && typeof bookPrice != "undefined")
+			   	   body += '&price='+bookPrice;
+
+			   console.log(body);
+				if (state == 0)
+			   fetch("/book",{
+			   		method:"put",
+				    headers:{
+			   			'content-type':'application/x-www-form-urlencoded; charset=UTF-8'
+					},
+				   body:body
+			   }).then(function (response) {
+			   		return response.text()
+			   }).then(function (value) {
+			   		console.log(value)
+			   }).catch(function (reason) {
+
+			   })
+		   })
+	   });
+	</script>
+</head>
+<body>
+   <div class="ad_page">
+   	<div class="header">
+   		<img src="../images/logo.png">
+   		<div class="state">
+   			<div class="ad_name"><div class="fa_i"><i class="fa fa-user"></i></div><a href="../html/adPersonal.html">管理员01</a></div>
+        <div class="out">退出</div>
+   		</div>
+   		<div class="clear"></div>
+   	</div>
+   	<div class="content">
+   		<div class="left">
+   			<ul>
+				<a href="../html/adBorrowBook.html"><li>读者借书<div class="trig"></div></li></a>
+                <a href="../html/adReturnBook.html"><li>读者还书<div class="trig"></div></li></a>
+                <a href="../html/adAddBook.html"><li>新书入库<div class="trig"></div></li></a>
+                <a href="../html/adOutBook.html"><li>图书出库<div class="trig"></div></li></a>
+                <a href="../html/adAlterBook.html"><li>修改图书信息<div class="trig"></div></li></a>
+                <a href="../html/adCheckBook.html"><li>查阅借阅记录<div class="trig"></div></li></a>
+                <a href="../html/adSearchBook.html"><li>查阅图书信息<div class="trig"></div></li></a>
+                <a href="../html/adPersonal.html"><li>管理员中心<div class="trig"></div></li></a>
+   			</ul>
+   		</div>
+   		<div class="right">
+      <!-- class="ad_data"的div中是图书管理员系统的切换部分 -->
+   			<div class="ad_data">
+				<div class="data data_1"><label>图书编号</label><input  class="data_bookId" type="text" /></div>
+				<div class="data"><label>图书名称</label><input type="text" class="data_bookName"/></div>
+				<div class="data"><label>作者</label><input type="text" class="data_bookAuthor"/></div>
+				<div class="data"><label>译者</label><input type="text" class="data_bookTranslator"/></div>
+				<div class="data"><label>价格</label><input type="text" class="data_bookPrice"/></div>
+				<div class="data"><label>ISBN编码</label><input type="text" class="data_ISBNCode"/></div>
+				<div class="data"><label>出版社</label><input type="text" class="data_publishCompany"/></div>
+				<div class="data"><label>出版日期</label><input type="text" class="data_comeUpTime"/></div>
+				<div class="data"><label>入库者</label><input type="text" class="data_enteringMen"/></div>
+				<div class="add_btn">提交修改</div>
+				<div class="noadd_btn">取消</div>
+   			</div>
+   		</div>
+   		<div class="clear"></div>
+   	</div>
+   </div>
+</body>
+</html>
